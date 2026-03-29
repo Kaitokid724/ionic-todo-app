@@ -1,0 +1,211 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="header-content">
+      <div class="header-left">
+        <p class="greeting">{{ greeting() }}</p>
+        <h1 class="header-title">Mis Tareas</h1>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" (click)="navigateToCategories()">
+          <ion-icon name="reorder-three-outline"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Background decoration -->
+  <div class="bg-decoration">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <!-- Stats Dashboard (Feature Flag controlled) -->
+  @if (flags().showStatsDashboard) {
+    <app-stats-card [stats]="stats()" class="animate-slide-up stagger-1"></app-stats-card>
+  }
+
+  <!-- Search bar -->
+  <div class="search-wrapper animate-slide-up stagger-2">
+    <ion-searchbar
+      placeholder="Buscar tareas..."
+      [debounce]="300"
+      (ionInput)="onSearchChange($event)"
+      class="custom-searchbar"
+    ></ion-searchbar>
+  </div>
+
+  <!-- Filter Bar -->
+  <app-filter-bar
+    [categories]="categories()"
+    [activeCategory]="filterCategory()"
+    [activeStatus]="filterStatus()"
+    (categoryChange)="onCategoryFilter($event)"
+    (statusChange)="onStatusFilterChange($event)"
+    class="animate-slide-up stagger-3"
+  ></app-filter-bar>
+
+  <!-- Active filters indicator -->
+  @if (hasActiveFilters) {
+    <div class="active-filters animate-fade-in">
+      <span class="filters-label">Filtros activos</span>
+      <button class="clear-filters-btn" (click)="clearFilters()">
+        <ion-icon name="close-circle-outline"></ion-icon>
+        Limpiar
+      </button>
+    </div>
+  }
+
+  <!-- Task List -->
+  <div class="task-list">
+    @if (filteredTasks().length === 0) {
+      <app-empty-state
+        [hasFilters]="hasActiveFilters"
+        (addTask)="openAddModal()"
+        (clearFilters)="clearFilters()"
+      ></app-empty-state>
+    } @else {
+      @for (task of filteredTasks(); track task.id; let i = $index) {
+        <app-task-item
+          [task]="task"
+          [category]="categoryService.getById(task.categoryId ?? '')"
+          [style.animation-delay]="i * 40 + 'ms'"
+          (toggle)="onToggleTask($event)"
+          (delete)="onDeleteTask($event)"
+          (open)="onOpenTask($event)"
+          class="animate-slide-up"
+        ></app-task-item>
+      }
+    }
+  </div>
+
+  <!-- FAB Add Button -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="openAddModal()" class="fab-add">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+
+<!-- Add Task Modal -->
+<ion-modal #addTaskModal [breakpoints]="[0, 0.75, 1]" [initialBreakpoint]="0.75" [backdropBreakpoint]="0.5">
+  <ng-template>
+    <div class="modal-container">
+      <div class="modal-handle"></div>
+
+      <div class="modal-header">
+        <h2 class="modal-title">Nueva Tarea</h2>
+        <button class="modal-close" (click)="dismissModal()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Title -->
+        <div class="form-group">
+          <label class="form-label">Título *</label>
+          <input
+            class="form-input"
+            type="text"
+            placeholder="¿Qué necesitas hacer?"
+            [(ngModel)]="newTaskTitle"
+            maxlength="120"
+            autofocus
+          />
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label class="form-label">Descripción</label>
+          <textarea
+            class="form-textarea"
+            placeholder="Detalles opcionales..."
+            [(ngModel)]="newTaskDescription"
+            rows="2"
+            maxlength="500"
+          ></textarea>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label class="form-label">Categoría</label>
+          <div class="category-picker">
+            <button
+              class="cat-option"
+              [class.selected]="newTaskCategory === null"
+              (click)="newTaskCategory = null"
+            >
+              <span class="cat-dot" style="background: #8a8aad"></span>
+              Sin categoría
+            </button>
+            @for (cat of categories(); track cat.id) {
+              <button
+                class="cat-option"
+                [class.selected]="newTaskCategory === cat.id"
+                (click)="newTaskCategory = cat.id"
+              >
+                <span class="cat-dot cat-{{ cat.color }}"></span>
+                {{ cat.name }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Priority (Feature flag controlled) -->
+        @if (flags().enablePriority) {
+          <div class="form-group">
+            <label class="form-label">Prioridad</label>
+            <div class="priority-picker">
+              @for (p of [['low','Baja','#2ed573'],['medium','Media','#ffa502'],['high','Alta','#ff4757']]; track p[0]) {
+                <button
+                  class="priority-option"
+                  [class.selected]="newTaskPriority === p[0]"
+                  [style.--p-color]="p[2]"
+                  (click)="newTaskPriority = $any(p[0])"
+                >
+                  <span class="priority-dot"></span>
+                  {{ p[1] }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Due Date (Feature flag controlled) -->
+        @if (flags().enableDueDate) {
+          <div class="form-group">
+            <label class="form-label">Fecha límite</label>
+            <button class="date-btn" (click)="showDatePicker = !showDatePicker">
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ newTaskDueDate ? (newTaskDueDate | date:'dd/MM/yyyy') : 'Sin fecha' }}
+            </button>
+            @if (showDatePicker) {
+              <ion-datetime
+                presentation="date"
+                [(ngModel)]="newTaskDueDate"
+                [min]="today"
+                class="inline-datetime"
+                (ionChange)="showDatePicker = false"
+              ></ion-datetime>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="dismissModal()">Cancelar</button>
+        <button
+          class="btn-submit"
+          [disabled]="!newTaskTitle.trim() || isSubmitting"
+          (click)="submitTask()"
+        >
+          @if (isSubmitting) {
+            <ion-icon name="sparkles-outline"></ion-icon>
+          }
+          Crear Tarea
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</ion-modal>

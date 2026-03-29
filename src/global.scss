@@ -1,0 +1,103 @@
+// Global styles
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  font-family: 'DM Sans', sans-serif;
+}
+
+// Custom scrollbar
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ion-color-medium);
+  border-radius: 2px;
+}
+
+// Ionic overrides
+ion-content {
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+ion-toolbar {
+  --border-width: 0 !important;
+}
+
+ion-item {
+  --background: transparent;
+  --inner-padding-end: 0;
+}
+
+// Animations
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-up {
+  animation: slideInUp 0.3s ease forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.25s ease forwards;
+}
+
+// Staggered animation helpers
+@for $i from 1 through 10 {
+  .stagger-#{$i} {
+    animation-delay: #{$i * 60}ms;
+    opacity: 0;
+  }
+}
+
+// Task status colors
+.task-priority-high {
+  --priority-color: #ff4757;
+}
+
+.task-priority-medium {
+  --priority-color: #ffa502;
+}
+
+.task-priority-low {
+  --priority-color: #2ed573;
+}

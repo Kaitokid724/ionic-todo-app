@@ -1,0 +1,153 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" class="back-btn">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      @if (!isEditing()) {
+        <ion-button (click)="startEdit()" class="action-btn">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="confirmDelete()" class="action-btn danger">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
+      } @else {
+        <ion-button (click)="cancelEdit()" class="action-btn">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+      }
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (task()) {
+    @if (!isEditing()) {
+      <!-- VIEW MODE -->
+      <div class="detail-view animate-fade-in">
+        <!-- Status badge -->
+        <div class="status-badge" [class.completed]="task()!.completed">
+          <ion-icon [name]="task()!.completed ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+          {{ task()!.completed ? 'Completada' : 'Pendiente' }}
+        </div>
+
+        <!-- Title -->
+        <h1 class="task-title" [class.done]="task()!.completed">{{ task()!.title }}</h1>
+
+        <!-- Description -->
+        @if (task()!.description) {
+          <p class="task-description">{{ task()!.description }}</p>
+        }
+
+        <!-- Meta chips -->
+        <div class="meta-row">
+          <!-- Category -->
+          @if (category()) {
+            <div class="meta-chip cat-{{ category()!.color }}">
+              <ion-icon [name]="category()!.icon"></ion-icon>
+              {{ category()!.name }}
+            </div>
+          }
+
+          <!-- Priority -->
+          @if (flags().enablePriority) {
+            <div class="meta-chip priority" [style.--p-color]="PRIORITY_COLORS[task()!.priority]">
+              <ion-icon name="flag-outline"></ion-icon>
+              {{ PRIORITY_LABELS[task()!.priority] }}
+            </div>
+          }
+
+          <!-- Due date -->
+          @if (flags().enableDueDate && task()!.dueDate) {
+            <div class="meta-chip date">
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ task()!.dueDate! | date:'dd MMM yyyy' }}
+            </div>
+          }
+        </div>
+
+        <!-- Timestamps -->
+        <div class="timestamps">
+          <div class="ts-item">
+            <span class="ts-label">Creada</span>
+            <span class="ts-value">{{ task()!.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          @if (task()!.completedAt) {
+            <div class="ts-item">
+              <span class="ts-label">Completada</span>
+              <span class="ts-value">{{ task()!.completedAt! | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Toggle button -->
+        <button
+          class="btn-toggle"
+          [class.completed]="task()!.completed"
+          (click)="toggleComplete()"
+        >
+          <ion-icon [name]="task()!.completed ? 'ellipse-outline' : 'checkmark-circle'"></ion-icon>
+          {{ task()!.completed ? 'Marcar como pendiente' : 'Marcar como completada' }}
+        </button>
+      </div>
+
+    } @else {
+      <!-- EDIT MODE -->
+      <div class="edit-view animate-fade-in">
+        <h2 class="edit-title">Editar Tarea</h2>
+
+        <div class="form-group">
+          <label class="form-label">Título *</label>
+          <input class="form-input" type="text" [(ngModel)]="editTitle" maxlength="120" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Descripción</label>
+          <textarea class="form-textarea" [(ngModel)]="editDescription" rows="3" maxlength="500"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Categoría</label>
+          <div class="category-picker">
+            <button class="cat-option" [class.selected]="editCategoryId === null" (click)="editCategoryId = null">
+              <span class="cat-dot" style="background: #8a8aad"></span>
+              Sin categoría
+            </button>
+            @for (cat of categories(); track cat.id) {
+              <button class="cat-option" [class.selected]="editCategoryId === cat.id" (click)="editCategoryId = cat.id">
+                <span class="cat-dot cat-{{ cat.color }}"></span>
+                {{ cat.name }}
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (flags().enablePriority) {
+          <div class="form-group">
+            <label class="form-label">Prioridad</label>
+            <div class="priority-picker">
+              @for (p of [['low','Baja','#2ed573'],['medium','Media','#ffa502'],['high','Alta','#ff4757']]; track p[0]) {
+                <button
+                  class="priority-option"
+                  [class.selected]="editPriority === p[0]"
+                  [style.--p-color]="p[2]"
+                  (click)="editPriority = $any(p[0])"
+                >
+                  <span class="priority-dot"></span>
+                  {{ p[1] }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <button class="btn-save" [disabled]="!editTitle.trim()" (click)="saveEdit()">
+          <ion-icon name="save-outline"></ion-icon>
+          Guardar cambios
+        </button>
+      </div>
+    }
+  }
+</ion-content>

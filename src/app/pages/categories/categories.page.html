@@ -1,0 +1,145 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" class="back-btn">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="page-title">Categorías</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openCreateModal()" class="add-cat-btn">
+        <ion-icon name="add-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="bg-decoration">
+    <div class="blob blob-1"></div>
+  </div>
+
+  <div class="categories-wrapper">
+    @if (categories().length === 0) {
+      <div class="empty-cats animate-scale-in">
+        <div class="empty-icon">🗂️</div>
+        <h3>Sin categorías</h3>
+        <p>Crea categorías para organizar mejor tus tareas</p>
+        <button class="btn-create-first" (click)="openCreateModal()">
+          <ion-icon name="add-outline"></ion-icon>
+          Crear primera categoría
+        </button>
+      </div>
+    } @else {
+      <div class="categories-grid">
+        @for (cat of categories(); track cat.id; let i = $index) {
+          <div
+            class="cat-card animate-slide-up cat-{{ cat.color }}"
+            [style.animation-delay]="i * 60 + 'ms'"
+            [style.opacity]="0"
+          >
+            <div class="cat-card-top">
+              <div class="cat-icon-wrap">
+                <ion-icon [name]="cat.icon"></ion-icon>
+              </div>
+              <div class="cat-actions">
+                <button class="cat-action-btn" (click)="openEditModal(cat)">
+                  <ion-icon name="create-outline"></ion-icon>
+                </button>
+                <button class="cat-action-btn danger" (click)="confirmDelete(cat)">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="cat-card-info">
+              <h3 class="cat-name">{{ cat.name }}</h3>
+              <div class="cat-task-count">
+                <ion-icon name="list-outline"></ion-icon>
+                {{ getTaskCount(cat.id) }} {{ getTaskCount(cat.id) === 1 ? 'tarea' : 'tareas' }}
+              </div>
+            </div>
+
+            <div class="cat-color-bar"></div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</ion-content>
+
+<!-- Category Modal -->
+<ion-modal #categoryModal [breakpoints]="[0, 0.65]" [initialBreakpoint]="0.65">
+  <ng-template>
+    <div class="modal-container">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h2 class="modal-title">{{ editingCategory ? 'Editar' : 'Nueva' }} Categoría</h2>
+        <button class="modal-close" (click)="dismissModal()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Name -->
+        <div class="form-group">
+          <label class="form-label">Nombre *</label>
+          <input
+            class="form-input"
+            type="text"
+            placeholder="Ej. Trabajo, Personal..."
+            [(ngModel)]="formName"
+            maxlength="30"
+          />
+        </div>
+
+        <!-- Color -->
+        <div class="form-group">
+          <label class="form-label">Color</label>
+          <div class="color-grid">
+            @for (c of CATEGORY_COLORS; track c.value) {
+              <button
+                class="color-swatch"
+                [class.selected]="formColor === c.value"
+                [style.background]="c.hex"
+                [title]="c.label"
+                (click)="formColor = c.value"
+              >
+                @if (formColor === c.value) {
+                  <ion-icon name="checkmark-outline"></ion-icon>
+                }
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Icon -->
+        <div class="form-group">
+          <label class="form-label">Ícono</label>
+          <div class="icon-grid">
+            @for (ico of CATEGORY_ICONS; track ico) {
+              <button
+                class="icon-option"
+                [class.selected]="formIcon === ico"
+                (click)="formIcon = ico"
+              >
+                <ion-icon [name]="ico"></ion-icon>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="dismissModal()">Cancelar</button>
+        <button
+          class="btn-submit"
+          [disabled]="!formName.trim() || isSubmitting"
+          (click)="submitCategory()"
+        >
+          {{ editingCategory ? 'Guardar' : 'Crear' }}
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</ion-modal>

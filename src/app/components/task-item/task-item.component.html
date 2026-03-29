@@ -1,0 +1,45 @@
+<div
+  class="task-card"
+  [class.completed]="task.completed"
+  [class.overdue]="isOverdue"
+  (click)="onOpen()"
+  ion-ripple-effect
+>
+  <!-- Priority indicator -->
+  <div class="priority-bar" [style.background]="PRIORITY_COLORS[task.priority]"></div>
+
+  <!-- Checkbox -->
+  <button class="checkbox-btn" (click)="onToggle($event)">
+    <ion-icon [name]="task.completed ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+  </button>
+
+  <!-- Content -->
+  <div class="task-content">
+    <span class="task-title" [class.done]="task.completed">{{ task.title }}</span>
+
+    <div class="task-meta">
+      <!-- Category badge -->
+      @if (category) {
+        <span class="meta-badge cat cat-{{ category.color }}">
+          <ion-icon [name]="category.icon"></ion-icon>
+          {{ category.name }}
+        </span>
+      }
+
+      <!-- Due date -->
+      @if (task.dueDate) {
+        <span class="meta-badge" [class.overdue-badge]="isOverdue">
+          <ion-icon name="calendar-outline"></ion-icon>
+          {{ task.dueDate | date:'dd/MM' }}
+        </span>
+      }
+    </div>
+  </div>
+
+  <!-- Delete btn -->
+  <button class="delete-btn" (click)="onDelete($event)">
+    <ion-icon name="trash-outline"></ion-icon>
+  </button>
+
+  <ion-ripple-effect></ion-ripple-effect>
+</div>

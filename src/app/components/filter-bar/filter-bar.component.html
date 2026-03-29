@@ -1,0 +1,40 @@
+<div class="filter-bar">
+  <!-- Status filters -->
+  <div class="status-filters">
+    @for (f of statusFilters; track f.value) {
+      <button
+        class="status-btn"
+        [class.active]="activeStatus === f.value"
+        (click)="onStatusClick(f.value)"
+      >
+        {{ f.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Category filters -->
+  @if (categories.length > 0) {
+    <div class="category-scroll">
+      <button
+        class="cat-filter-btn"
+        [class.active]="activeCategory === null"
+        (click)="categoryChange.emit(null)"
+      >
+        <ion-icon name="list-outline"></ion-icon>
+        Todas
+      </button>
+
+      @for (cat of categories; track cat.id) {
+        <button
+          class="cat-filter-btn"
+          [class.active]="activeCategory === cat.id"
+          [class]="'cat-filter-btn cat-' + cat.color + (activeCategory === cat.id ? ' active' : '')"
+          (click)="categoryChange.emit(cat.id)"
+        >
+          <ion-icon [name]="cat.icon"></ion-icon>
+          {{ cat.name }}
+        </button>
+      }
+    </div>
+  }
+</div>

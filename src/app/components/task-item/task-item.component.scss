@@ -1,0 +1,145 @@
+:host {
+  display: block;
+}
+
+.task-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: 18px;
+  padding: 14px 14px 14px 16px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.85;
+  }
+
+  &.completed {
+    opacity: 0.55;
+    background: var(--app-surface);
+  }
+
+  &.overdue {
+    border-color: rgba(255, 71, 87, 0.3);
+  }
+}
+
+.priority-bar {
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  opacity: 0.8;
+}
+
+.checkbox-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 26px;
+    color: var(--ion-color-primary);
+    transition: transform 0.2s;
+  }
+
+  &:active ion-icon {
+    transform: scale(0.85);
+  }
+}
+
+.task-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.task-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--app-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.2s;
+
+  &.done {
+    text-decoration: line-through;
+    color: var(--app-text-secondary);
+  }
+}
+
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 20px;
+  color: var(--app-text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+
+  ion-icon { font-size: 11px; }
+
+  &.overdue-badge {
+    color: var(--ion-color-danger);
+    background: rgba(255, 71, 87, 0.1);
+  }
+
+  // Category colors
+  &.cat.cat-indigo { color: #5c49e0; background: rgba(92, 73, 224, 0.1); }
+  &.cat.cat-violet { color: #9b59f7; background: rgba(155, 89, 247, 0.1); }
+  &.cat.cat-cyan { color: #00d2d3; background: rgba(0, 210, 211, 0.1); }
+  &.cat.cat-emerald { color: #2ed573; background: rgba(46, 213, 115, 0.1); }
+  &.cat.cat-amber { color: #ffa502; background: rgba(255, 165, 2, 0.1); }
+  &.cat.cat-rose { color: #ff4757; background: rgba(255, 71, 87, 0.1); }
+  &.cat.cat-pink { color: #ff6b9d; background: rgba(255, 107, 157, 0.1); }
+  &.cat.cat-sky { color: #70a1ff; background: rgba(112, 161, 255, 0.1); }
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s;
+
+  ion-icon {
+    font-size: 18px;
+    color: var(--app-text-secondary);
+    transition: color 0.2s;
+  }
+
+  &:active {
+    background: rgba(255, 71, 87, 0.1);
+
+    ion-icon { color: var(--ion-color-danger); }
+  }
+}

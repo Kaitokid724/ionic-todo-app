@@ -1,0 +1,34 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build output
+www/
+dist/
+
+# Cordova
+platforms/
+plugins/
+
+# Angular
+.angular/
+
+# Environment (don't commit secrets)
+# src/environments/environment.prod.ts  ← uncomment if you want to hide prod keys
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Ionic
+.ionic/
+
+# Test coverage
+coverage/
