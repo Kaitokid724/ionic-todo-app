@@ -1,7 +1,6 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-  "defaultProject": "app",
   "projects": {
     "app": {
       "projectType": "application",
@@ -15,11 +14,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "www",
             "index": "src/index.html",
-            "main": "src/main.ts",
+            "browser": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -36,12 +35,8 @@
               }
             ],
             "styles": [
-              {
-                "input": "src/theme/variables.scss"
-              },
-              {
-                "input": "src/global.scss"
-              }
+              "src/theme/variables.scss",
+              "src/global.scss"
             ],
             "scripts": []
           },
@@ -59,20 +54,10 @@
                   "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all",
-              "optimization": true,
-              "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true
+              "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
             }
@@ -95,6 +80,6 @@
     }
   },
   "cli": {
-    "analytics": "ef86218f-9ea3-4b45-8096-9323390d2920"
+    "analytics": "55c835fd-8a51-4ed0-8bbc-d0e7599f5711"
   }
 }

@@ -1,6 +1,6 @@
 # 📱 Ionic Todo App
 
-Aplicación de lista de tareas (To-Do) construida por Daniel Valencia p. con **Ionic 7 + Angular 17**, con soporte de categorías, filtros, Firebase Remote Config y compilación para Android/iOS con Cordova.
+Aplicación de lista de tareas (To-Do) construida por Daniel Valencia p. con Ionic 7 + Angular 17, con soporte de categorías, filtros, Firebase Remote Config y compilación para Android/iOS con Cordova.
 
 ---
 
