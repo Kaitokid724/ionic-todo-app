@@ -98,25 +98,7 @@ La app estará disponible en `http://localhost:8100`
 
 ---
 
-## 🔥 Configurar Firebase
 
-1. Ve a [Firebase Console](https://console.firebase.google.com/)
-2. Crea un nuevo proyecto
-3. Agrega una app web
-4. Copia las credenciales en `src/environments/environment.ts`:
-
-```typescript
-export const environment = {
-  production: false,
-  firebase: {
-    apiKey: 'TU_API_KEY',
-    authDomain: 'TU_PROYECTO.firebaseapp.com',
-    projectId: 'TU_PROYECTO_ID',
-    storageBucket: 'TU_PROYECTO.appspot.com',
-    messagingSenderId: 'TU_SENDER_ID',
-    appId: 'TU_APP_ID',
-  },
-};
 ```
 
 5. En Firebase Console → **Remote Config**, crea los parámetros:
