@@ -1,8 +1,13 @@
 import { enableProdMode, importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { RouteReuseStrategy, provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
+import {
+  RouteReuseStrategy,
+  provideRouter,
+  withPreloading,
+  PreloadAllModules,
+} from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
-import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
@@ -17,6 +22,6 @@ bootstrapApplication(AppComponent, {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular({ mode: 'ios' }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
-    provideAnimations(),
+    provideAnimationsAsync(),
   ],
 });
