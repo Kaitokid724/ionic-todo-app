@@ -1,26 +1,26 @@
 import { Injectable, signal } from '@angular/core';
-import { environment } from '../../environments/environment';
 
-// Firebase imports
-import { initializeApp, FirebaseApp } from 'firebase/app';
-import {
-  getRemoteConfig,
-  fetchAndActivate,
-  getValue,
-  RemoteConfig,
-} from 'firebase/remote-config';
-
+/**
+ * Feature flags controlados por Remote Config.
+ * 
+ * Para conectar Firebase real:
+ * 1. npm install firebase
+ * 2. Reemplaza la implementación mock por la real (ver comentarios abajo)
+ * 3. Configura src/environments/environment.ts con tus credenciales
+ */
 export interface RemoteFlags {
-  /** Feature flag: show task statistics dashboard on home */
+  /** Muestra el panel de estadísticas en home */
   showStatsDashboard: boolean;
-  /** Feature flag: enable priority selection for tasks */
+  /** Activa la selección de prioridad en tareas */
   enablePriority: boolean;
-  /** Feature flag: enable due date picker */
+  /** Activa el selector de fecha límite */
   enableDueDate: boolean;
-  /** Feature flag: enable subtasks (future feature) */
+  /** Activa subtareas (funcionalidad futura) */
   enableSubtasks: boolean;
 }
 
+// Valores por defecto — se usan cuando Firebase no está configurado
+// o mientras se cargan los valores remotos
 const DEFAULT_FLAGS: RemoteFlags = {
   showStatsDashboard: true,
   enablePriority: true,
@@ -28,13 +28,11 @@ const DEFAULT_FLAGS: RemoteFlags = {
   enableSubtasks: false,
 };
 
-@Injectable({
-  providedIn: 'root',
-})
-export class FirebaseService {
-  private app: FirebaseApp | null = null;
-  private remoteConfig: RemoteConfig | null = null;
+// Clave de localStorage para persistir flags entre sesiones
+const FLAGS_STORAGE_KEY = 'remote_flags';
 
+@Injectable({ providedIn: 'root' })
+export class FirebaseService {
   private _flags = signal<RemoteFlags>(DEFAULT_FLAGS);
   private _initialized = signal(false);
   private _loading = signal(false);
@@ -44,51 +42,44 @@ export class FirebaseService {
   readonly loading = this._loading.asReadonly();
 
   async initialize(): Promise<void> {
+    this._loading.set(true);
     try {
-      this._loading.set(true);
-
-      // Only initialize if a real API key is configured
-      if (environment.firebase.apiKey === 'YOUR_API_KEY') {
-        console.warn(
-          '[Firebase] Using default flags — configure src/environments/environment.ts with your Firebase credentials.'
-        );
-        this._flags.set(DEFAULT_FLAGS);
-        this._initialized.set(true);
-        this._loading.set(false);
-        return;
+      // Carga flags guardados localmente (simulando caché de Remote Config)
+      const saved = localStorage.getItem(FLAGS_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<RemoteFlags>;
+        this._flags.set({ ...DEFAULT_FLAGS, ...parsed });
       }
 
-      this.app = initializeApp(environment.firebase);
-      this.remoteConfig = getRemoteConfig(this.app);
+      /*
+       * ── Integración Firebase Real ──────────────────────────────────
+       * Cuando tengas Firebase configurado, reemplaza este bloque:
+       *
+       * import { initializeApp } from 'firebase/app';
+       * import { getRemoteConfig, fetchAndActivate, getValue } from 'firebase/remote-config';
+       * import { environment } from '../../environments/environment';
+       *
+       * const app = initializeApp(environment.firebase);
+       * const rc  = getRemoteConfig(app);
+       * rc.defaultConfig = DEFAULT_FLAGS as any;
+       * rc.settings.minimumFetchIntervalMillis = environment.production ? 3600000 : 0;
+       * await fetchAndActivate(rc);
+       *
+       * const flags: RemoteFlags = {
+       *   showStatsDashboard: getValue(rc, 'showStatsDashboard').asBoolean(),
+       *   enablePriority:     getValue(rc, 'enablePriority').asBoolean(),
+       *   enableDueDate:      getValue(rc, 'enableDueDate').asBoolean(),
+       *   enableSubtasks:     getValue(rc, 'enableSubtasks').asBoolean(),
+       * };
+       * this._flags.set(flags);
+       * localStorage.setItem(FLAGS_STORAGE_KEY, JSON.stringify(flags));
+       * ───────────────────────────────────────────────────────────────
+       */
 
-      // Set defaults so the app works even before fetching
-      this.remoteConfig.defaultConfig = {
-        showStatsDashboard: DEFAULT_FLAGS.showStatsDashboard,
-        enablePriority: DEFAULT_FLAGS.enablePriority,
-        enableDueDate: DEFAULT_FLAGS.enableDueDate,
-        enableSubtasks: DEFAULT_FLAGS.enableSubtasks,
-      };
-
-      // Minimum fetch interval: 1 hour in production, 0 in development
-      this.remoteConfig.settings.minimumFetchIntervalMillis = environment.production
-        ? 3600000
-        : 0;
-
-      await fetchAndActivate(this.remoteConfig);
-
-      const flags: RemoteFlags = {
-        showStatsDashboard: getValue(this.remoteConfig, 'showStatsDashboard').asBoolean(),
-        enablePriority: getValue(this.remoteConfig, 'enablePriority').asBoolean(),
-        enableDueDate: getValue(this.remoteConfig, 'enableDueDate').asBoolean(),
-        enableSubtasks: getValue(this.remoteConfig, 'enableSubtasks').asBoolean(),
-      };
-
-      this._flags.set(flags);
+      console.log('[RemoteConfig] Flags activos:', this._flags());
       this._initialized.set(true);
-
-      console.log('[Firebase] Remote Config loaded:', flags);
-    } catch (error) {
-      console.error('[Firebase] Remote Config error, using defaults:', error);
+    } catch (e) {
+      console.warn('[RemoteConfig] Error al cargar flags, usando defaults:', e);
       this._flags.set(DEFAULT_FLAGS);
       this._initialized.set(true);
     } finally {
@@ -97,23 +88,18 @@ export class FirebaseService {
   }
 
   /**
-   * Force-refresh remote config values (useful for testing feature flags)
+   * Permite cambiar flags en tiempo real desde la UI (demo del feature flag).
+   * En producción esto lo haría Remote Config automáticamente.
    */
-  async refresh(): Promise<void> {
-    if (!this.remoteConfig) return;
-    try {
-      this._loading.set(true);
-      this.remoteConfig.settings.minimumFetchIntervalMillis = 0;
-      await fetchAndActivate(this.remoteConfig);
-      const flags: RemoteFlags = {
-        showStatsDashboard: getValue(this.remoteConfig, 'showStatsDashboard').asBoolean(),
-        enablePriority: getValue(this.remoteConfig, 'enablePriority').asBoolean(),
-        enableDueDate: getValue(this.remoteConfig, 'enableDueDate').asBoolean(),
-        enableSubtasks: getValue(this.remoteConfig, 'enableSubtasks').asBoolean(),
-      };
-      this._flags.set(flags);
-    } finally {
-      this._loading.set(false);
-    }
+  setFlag<K extends keyof RemoteFlags>(key: K, value: RemoteFlags[K]): void {
+    const updated = { ...this._flags(), [key]: value };
+    this._flags.set(updated);
+    localStorage.setItem(FLAGS_STORAGE_KEY, JSON.stringify(updated));
+    console.log(`[RemoteConfig] Flag "${key}" → ${value}`);
+  }
+
+  resetFlags(): void {
+    this._flags.set(DEFAULT_FLAGS);
+    localStorage.removeItem(FLAGS_STORAGE_KEY);
   }
 }
