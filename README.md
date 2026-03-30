@@ -1,6 +1,6 @@
 # 📱 Ionic Todo App
 
-Aplicación de lista de tareas (To-Do) construida con **Ionic 7 + Angular 17**, con soporte de categorías, filtros, Firebase Remote Config y compilación para Android/iOS con Cordova.
+Aplicación de lista de tareas (To-Do) construida por Daniel Valencia p, con Ionic 7 + Angular 17, con soporte de categorías, filtros, Firebase Remote Config y compilación para Android/iOS con Cordova.
 
 ---
 
@@ -98,107 +98,6 @@ La app estará disponible en `http://localhost:8100`
 
 ---
 
-## 🔥 Configurar Firebase
-
-1. Ve a [Firebase Console](https://console.firebase.google.com/)
-2. Crea un nuevo proyecto
-3. Agrega una app web
-4. Copia las credenciales en `src/environments/environment.ts`:
-
-```typescript
-export const environment = {
-  production: false,
-  firebase: {
-    apiKey: 'TU_API_KEY',
-    authDomain: 'TU_PROYECTO.firebaseapp.com',
-    projectId: 'TU_PROYECTO_ID',
-    storageBucket: 'TU_PROYECTO.appspot.com',
-    messagingSenderId: 'TU_SENDER_ID',
-    appId: 'TU_APP_ID',
-  },
-};
-```
-
-5. En Firebase Console → **Remote Config**, crea los parámetros:
-   - `showStatsDashboard` → Boolean → `true`
-   - `enablePriority` → Boolean → `true`
-   - `enableDueDate` → Boolean → `true`
-   - `enableSubtasks` → Boolean → `false`
-
-6. Publica los cambios
-
-> **Nota:** Si no configuras Firebase, la app usa los valores por defecto y funciona perfectamente.
-
-### Demo del Feature Flag
-Para ver el efecto del flag `showStatsDashboard`:
-- Cambia el valor a `false` en Remote Config y publica
-- Recarga la app → el panel de estadísticas desaparece
-- Cámbialo de nuevo a `true` → reaparece
-
----
-
-## 📱 Compilar para Android
-
-### Prerrequisitos
-- Android Studio instalado
-- Java JDK 17+
-- Variables de entorno `ANDROID_HOME` y `JAVA_HOME` configuradas
-
-```bash
-# Agregar plataforma Android
-ionic cordova platform add android
-
-# Build de producción
-ionic cordova build android --prod
-
-# Ejecutar en emulador
-ionic cordova emulate android --prod
-
-# Ejecutar en dispositivo físico (con USB y depuración habilitada)
-ionic cordova run android --prod --device
-```
-
-El APK se genera en:
-```
-platforms/android/app/build/outputs/apk/debug/app-debug.apk
-```
-
-Para APK firmado (release):
-```bash
-ionic cordova build android --prod --release
-```
-
----
-
-## 🍎 Compilar para iOS
-
-### Prerrequisitos
-- macOS con Xcode 14+
-- CocoaPods: `sudo gem install cocoapods`
-- Cuenta de desarrollador Apple (para dispositivo físico)
-
-```bash
-# Agregar plataforma iOS
-ionic cordova platform add ios
-
-# Instalar pods
-cd platforms/ios && pod install && cd ../..
-
-# Build
-ionic cordova build ios --prod
-
-# Abrir en Xcode para firmar y generar IPA
-open platforms/ios/IonicTodo.xcworkspace
-```
-
-En Xcode:
-1. Selecciona tu equipo de desarrollo (Apple ID)
-2. `Product → Archive`
-3. `Distribute App → Ad Hoc / App Store Connect`
-4. Exporta el `.ipa`
-
----
-
 ## ⚡ Optimizaciones de Rendimiento
 
 ### Aplicadas en este proyecto
@@ -256,7 +155,7 @@ rm -rf node_modules && npm install
 
 ---
 
-## ❓ Preguntas técnicas
+## Preguntas técnicas
 
 ### ¿Cuáles fueron los principales desafíos?
 
