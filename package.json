@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Ionic Angular To-Do App with Categories and Firebase",
   "scripts": {
-    "ng": "node_modules/.bin/ng",
-    "start": "node_modules/.bin/ng serve",
-    "build": "node_modules/.bin/ng build"
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build"
   },
   "private": true,
   "dependencies": {
